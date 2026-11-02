@@ -88,7 +88,7 @@ const LSKEY="mensetsu_v1";
 function freshState(){ return {
   cfg:{ target:"高校受験", dest:"", gender:"female", mood:"standard", qcount:5 },
   ai:{ provider:"gemini", p:{
-    gemini:{ key:"", model:"gemini-2.0-flash" },
+    gemini:{ key:"", model:"gemini-2.5-flash" },
     openai:{ key:"", model:"gpt-4o-mini" },
     claude:{ key:"", model:"claude-3-5-haiku-latest" },
     custom:{ base:"", key:"", model:"" },
@@ -105,31 +105,32 @@ function aiReady(){ const c=S.ai.p[S.ai.provider]; if(!c) return false;
   if(S.ai.provider==="custom") return !!(c.base&&c.model);
   return !!c.key; }
 /* ================= AI providers (browser-only keys) ================= */
+function apiErr(name, status){ return new Error(name+" API エラー ("+status+")"+(status===404?"：モデル名が使えない可能性があります。モデル欄を gemini-2.5-flash など、使えるモデル名に変えてお試しください。":"")); }
 async function aiChat(prompt){
   const prov=S.ai.provider, c=S.ai.p[prov];
   const sys="あなたは面接練習のコーチです。日本語で、簡潔で具体的に答えてください。";
   if(prov==="gemini"){
     const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(c.model)+":generateContent?key="+encodeURIComponent(c.key);
     const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:sys+"\n\n"+prompt}]}]})});
-    if(!r.ok) throw new Error("Gemini API エラー ("+r.status+")");
+    if(!r.ok) throw apiErr("Gemini", r.status);
     const j=await r.json(); return j.candidates[0].content.parts.map(p=>p.text||"").join("");
   }
   if(prov==="claude"){
     const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":c.key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:c.model,max_tokens:1200,system:sys,messages:[{role:"user",content:prompt}]})});
-    if(!r.ok) throw new Error("Claude API エラー ("+r.status+")");
+    if(!r.ok) throw apiErr("Claude", r.status);
     const j=await r.json(); return j.content.map(p=>p.text||"").join("");
   }
   if(prov==="ollama"){
     const base=(c.base||"http://localhost:11434").replace(/\/+$/,"");
     const r=await fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:c.model,stream:false,messages:[{role:"system",content:sys},{role:"user",content:prompt}]})});
-    if(!r.ok) throw new Error("Ollama エラー ("+r.status+")");
+    if(!r.ok) throw apiErr("Ollama", r.status);
     const j=await r.json(); return (j.message&&j.message.content)||"";
   }
   /* openai / custom: OpenAI-compatible chat completions */
   const base = prov==="openai" ? "https://api.openai.com/v1" : (c.base||"").replace(/\/+$/,"");
   const headers={"Content-Type":"application/json"}; if(c.key) headers["Authorization"]="Bearer "+c.key;
   const r=await fetch(base+"/chat/completions",{method:"POST",headers,body:JSON.stringify({model:c.model,messages:[{role:"system",content:sys},{role:"user",content:prompt}]})});
-  if(!r.ok) throw new Error((prov==="openai"?"OpenAI":"カスタム")+" API エラー ("+r.status+")");
+  if(!r.ok) throw apiErr(prov==="openai"?"OpenAI":"カスタム", r.status);
   const j=await r.json(); return j.choices[0].message.content||"";
 }
 /* ================= question bank (original standard questions) ================= */
