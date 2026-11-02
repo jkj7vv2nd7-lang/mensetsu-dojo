@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>面接道場</title>
+<meta name="theme-color" content="#274156">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{ --ink:#1c2333; --sub:#5c6a84; --line:#d9e0ec; --brand:#274156; --brand2:#3d6a8f; --bg:#f4f6fa; --ok:#1e9e62; --warn:#c47b12; --ng:#d33a2c; --card:#fff; }
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+header{background:var(--brand);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:19px;margin:0;font-weight:700}
+header .sub{font-size:12px;opacity:.85}
+main{max-width:720px;margin:0 auto;padding:14px 12px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.card h2{font-size:17px;margin:2px 0 10px}
+.card h3{font-size:15px;margin:14px 0 6px}
+.small{font-size:12.5px;color:var(--sub);line-height:1.6}
+.btn{display:block;width:100%;background:var(--brand2);color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:700;margin:8px 0;cursor:pointer}
+.btn:active{opacity:.85}
+.btn.sub{background:#e8eef6;color:var(--brand);border:1px solid var(--line)}
+.btn.ghost{background:#fff;color:var(--ng);border:1px solid var(--ng)}
+.btn.sm{width:auto;display:inline-block;padding:8px 14px;font-size:14px;margin:4px 4px 4px 0}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}
+label.fl{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+input[type=text],input[type=date],input[type=password],textarea,select{width:100%;font-size:16px;padding:10px;border:1.6px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}
+textarea{min-height:110px;line-height:1.6;resize:vertical}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.seg button{flex:1;min-width:64px;padding:10px 4px;border-radius:9px;border:1.6px solid var(--line);background:#fff;font-size:14.5px;cursor:pointer}
+.seg button.on{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700}
+.nav{margin:4px 0 8px}.nav button{background:none;border:none;color:var(--brand2);font-size:15px;cursor:pointer;padding:6px 2px}
+.officer{display:flex;gap:12px;align-items:flex-start}
+.officer .face{flex:0 0 118px}
+.officer .balloon{flex:1;background:#eef4fb;border:1.5px solid var(--line);border-radius:12px;padding:12px;position:relative;font-size:16.5px;line-height:1.75;min-height:96px}
+.officer .balloon:before{content:"";position:absolute;left:-9px;top:26px;border:9px solid transparent;border-right-color:var(--line);border-left:0}
+.qmeta{font-size:12.5px;color:var(--sub);margin-bottom:6px}
+.fb{font-size:16px;font-weight:700;margin:8px 0}
+.fb.ok{color:var(--ok)} .fb.ng{color:var(--ng)} .fb.warn{color:var(--warn)}
+.tag{display:inline-block;background:#e8eef6;color:var(--brand);border-radius:999px;padding:2px 10px;font-size:12px;margin:0 6px 4px 0}
+.kata{background:#fbf7ec;border:1.5px dashed #d9b95c;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.8;margin:10px 0}
+.kata b{color:#8a6d1a}
+.ans2{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.ans2{grid-template-columns:1fr 1fr}}
+.ansbox2{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.75;background:#fff;white-space:pre-wrap}
+.ansbox2.model{background:#f2f8f3;border-color:#bfe0c9}
+.ansbox2 h4{margin:0 0 6px;font-size:13px;color:var(--sub)}
+.check li{margin:5px 0;line-height:1.6}
+ul.check{padding-left:20px;margin:6px 0}
+.rec{border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
+.qitem{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.qitem .qt{font-size:15.5px;line-height:1.6}
+.hidden{display:none}
+.mic-on{background:var(--ng)!important;color:#fff!important;border-color:var(--ng)!important}
+.prog{height:8px;background:#e8eef6;border-radius:99px;overflow:hidden;margin:8px 0}
+.prog i{display:block;height:100%;background:var(--brand2)}
+details{margin:8px 0} summary{cursor:pointer;font-size:14.5px;color:var(--brand2);font-weight:700}
+.kv{font-size:13px;color:var(--sub)}
+.kv b{color:var(--ink)}
+</style>
+</head>
+<body>
+<header><div><h1>🎙 面接道場</h1><div class="sub">AI面接官と、本番みたいに練習</div></div></header>
+<main id="app"><div class="card"><h2>読み込み中…</h2><p class="small">この表示がずっと続く場合は、表示しているアプリ（チャットのプレビューなど）がスクリプトの実行を制限している可能性があります。その場合は、Safari や Chrome でこのファイルを開くか、公開ページのURLから開いてください。</p></div></main>
+<script>
+window.__msBooted=false;
+window.addEventListener("error",function(e){
+  if(window.__msBooted)return;
+  var el=document.getElementById("app");
+  if(el){ el.innerHTML='<div class="card"><h2>アプリを起動できませんでした</h2><p>この表示環境では、スクリプトや保存機能（localStorage）が制限されている可能性があります。</p><p>Safari や Chrome でファイルを開くか、公開ページのURLから開いてみてください。</p><p class="small">詳細: '+String(e.message||"不明なエラー")+'</p></div>'; }
+});
+</script>
+<script>
+"use strict";
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const RI=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; };
+const todayStr=()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const uid=()=> "id"+Date.now().toString(36)+Math.floor(Math.random()*9999);
+/* ================= state ================= */
+const LSKEY="mensetsu_v1";
+function freshState(){ return {
+  cfg:{ target:"高校受験", dest:"", gender:"female", mood:"standard", qcount:5 },
+  ai:{ provider:"gemini", p:{
+    gemini:{ key:"", model:"gemini-2.0-flash" },
+    openai:{ key:"", model:"gpt-4o-mini" },
+    claude:{ key:"", model:"claude-3-5-haiku-latest" },
+    custom:{ base:"", key:"", model:"" },
+    ollama:{ base:"http://localhost:11434", model:"llama3.1" } } },
+  custom:[],   /* {id, target, text, model, points} */
+  sets:[],     /* {id, name(dest), qids:[customQuestionIds]} */
+  records:[]   /* {date, target, dest, mood, partial, answers:[{q, a, fq, fa}]} */
+}; }
+let S=freshState();
+function load(){ try{ const raw=localStorage.getItem(LSKEY); if(raw){ const p=JSON.parse(raw); if(p&&p.cfg) S=Object.assign(freshState(), p); } }catch(e){ S=freshState(); } }
+function save(){ try{ localStorage.setItem(LSKEY, JSON.stringify(S)); }catch(e){ /* 保存できない環境でも動作は続ける */ } }
+function aiReady(){ const c=S.ai.p[S.ai.provider]; if(!c) return false;
+  if(S.ai.provider==="ollama") return !!c.model;
+  if(S.ai.provider==="custom") return !!(c.base&&c.model);
+  return !!c.key; }
+/* ================= AI providers (browser-only keys) ================= */
+async function aiChat(prompt){
+  const prov=S.ai.provider, c=S.ai.p[prov];
+  const sys="あなたは面接練習のコーチです。日本語で、簡潔で具体的に答えてください。";
+  if(prov==="gemini"){
+    const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(c.model)+":generateContent?key="+encodeURIComponent(c.key);
+    const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:sys+"\n\n"+prompt}]}]})});
+    if(!r.ok) throw new Error("Gemini API エラー ("+r.status+")");
+    const j=await r.json(); return j.candidates[0].content.parts.map(p=>p.text||"").join("");
+  }
+  if(prov==="claude"){
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":c.key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:c.model,max_tokens:1200,system:sys,messages:[{role:"user",content:prompt}]})});
+    if(!r.ok) throw new Error("Claude API エラー ("+r.status+")");
+    const j=await r.json(); return j.content.map(p=>p.text||"").join("");
+  }
+  if(prov==="ollama"){
+    const base=(c.base||"http://localhost:11434").replace(/\/+$/,"");
+    const r=await fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:c.model,stream:false,messages:[{role:"system",content:sys},{role:"user",content:prompt}]})});
+    if(!r.ok) throw new Error("Ollama エラー ("+r.status+")");
+    const j=await r.json(); return (j.message&&j.message.content)||"";
+  }
+  /* openai / custom: OpenAI-compatible chat completions */
+  const base = prov==="openai" ? "https://api.openai.com/v1" : (c.base||"").replace(/\/+$/,"");
+  const headers={"Content-Type":"application/json"}; if(c.key) headers["Authorization"]="Bearer "+c.key;
+  const r=await fetch(base+"/chat/completions",{method:"POST",headers,body:JSON.stringify({model:c.model,messages:[{role:"system",content:sys},{role:"user",content:prompt}]})});
+  if(!r.ok) throw new Error((prov==="openai"?"OpenAI":"カスタム")+" API エラー ("+r.status+")");
+  const j=await r.json(); return j.choices[0].message.content||"";
+}
+/* ================= question bank (original standard questions) ================= */
+/* q: 質問, p: 面接官はここを見ている, h: 答え方のヒント */
+const BANK={
+"中学受験":[
+ {q:"この学校を志望した理由を教えてください。",p:"学校のことを具体的に知っているか、自分の言葉で語れるか",h:"結論（いちばんの理由）→ 学校で見た・聞いた具体例 → 入学後にやりたいこと"},
+ {q:"小学校生活でいちばん頑張ったことは何ですか。",p:"努力の過程を順序立てて話せるか",h:"結論 → 取り組みの工夫や苦労 → そこから学んだこと"},
+ {q:"好きな教科と、その理由を教えてください。",p:"興味の広がりと、理由の具体性",h:"結論 → どんなところが面白いか（具体例） → もっと深めたいこと"},
+ {q:"最近読んだ本について教えてください。",p:"読書習慣と、心に残った点を自分の言葉で言えるか",h:"本の紹介（短く）→ 心に残った場面 → 自分が考えたこと"},
+ {q:"入学したら、どんなことに挑戦したいですか。",p:"入学後の意欲と、目標の具体性",h:"結論 → そのために今していること → 目標"},
+ {q:"友達と意見が合わなかったとき、どうしますか。",p:"協調性と、相手を尊重する姿勢",h:"まず相手の話を聞く → 自分の考えを伝える → 落ち着いて解決した例"},
+ {q:"将来の夢を教えてください。",p:"夢と今の努力がつながっているか",h:"夢 → きっかけとなった経験 → 今頑張っていること"},
+ {q:"あなたの長所と短所を教えてください。",p:"自分を客観的に見られているか",h:"長所は具体例つきで、短所は改善の努力とセットで"}],
+"高校受験":[
+ {q:"本校を志望した理由を教えてください。",p:"学校理解の深さと、志望度の高さ",h:"結論 → 学校説明会や行事で感じた具体例 → 高校でやりたいこと"},
+ {q:"中学校生活で最も力を入れたことは何ですか。",p:"継続する力と、成果までの過程",h:"結論 → 工夫や挫折と乗り越え方 → 学んだこと"},
+ {q:"高校生活で挑戦したいことは何ですか。",p:"目標の具体性と意欲",h:"結論 → 中学での経験とのつながり → 3年間の計画"},
+ {q:"あなたの長所と短所を教えてください。",p:"自己分析の深さと、短所への向き合い方",h:"長所はエピソードで裏づけ、短所は改善策とセットで"},
+ {q:"最近気になったニュースについて、あなたの考えを聞かせてください。",p:"社会への関心と、自分の意見を持っているか",h:"事実を短く → 自分の考え → 理由"},
+ {q:"将来の夢や、進路の希望を教えてください。",p:"将来と高校生活がつながっているか",h:"結論 → きっかけ → そのために高校で学びたいこと"},
+ {q:"勉強と部活動はどう両立しますか。",p:"計画性と自己管理の姿勢",h:"結論 → 具体的な時間の使い方 → 両立で得られること"},
+ {q:"苦手な教科にはどう取り組んでいますか。",p:"課題への向き合い方と改善の工夫",h:"現状 → 原因の分析 → 具体的な対策と手ごたえ"}],
+"大学受験":[
+ {q:"本学を志望した理由を教えてください。",p:"大学・学部理解と志望の軸の一貫性",h:"結論 → 学びたい学問・研究の具体例 → 将来像との接続"},
+ {q:"この学部で、特に学びたいテーマは何ですか。",p:"学問への関心の深さと具体性",h:"テーマ → 関心を持ったきっかけ（本・経験） → 深めたい問い"},
+ {q:"高校時代に探究したこと、力を入れたことを教えてください。",p:"主体性と、学びを深める姿勢",h:"テーマと動機 → 取り組みの過程 → 得た学びと大学への接続"},
+ {q:"将来はどのような進路を考えていますか。",p:"将来像と大学での学びの結びつき",h:"結論 → 理由・きっかけ → 大学で身につけたい力"},
+ {q:"最近読んだ本や記事で印象に残ったものはありますか。",p:"知的好奇心と、内容を自分の言葉で語れるか",h:"概要を短く → 印象に残った点 → 自分の考え"},
+ {q:"あなたの強みを、大学生活でどう生かしますか。",p:"強みの裏づけと、貢献の意識",h:"強み → 高校での具体例 → 大学での生かし方"},
+ {q:"気になる社会問題について、考えを聞かせてください。",p:"多角的に考え、自分の意見を述べられるか",h:"問題の概要 → 自分の立場 → 根拠と配慮したい視点"},
+ {q:"入学後、学業以外で挑戦したいことはありますか。",p:"大学生活への意欲と幅広い関心",h:"結論 → 理由 → 学業との両立の考え"}],
+"就活":[
+ {q:"自己PRをお願いします。",p:"強みが具体例で裏づけられているか",h:"結論（強み）→ 学生時代の具体例 → 仕事での生かし方"},
+ {q:"弊社を志望した理由を教えてください。",p:"企業理解と、志望度の高さ",h:"結論 → 事業や社風の具体例 → 自分の経験との接続"},
+ {q:"学生時代に最も力を入れたことは何ですか。",p:"主体性・課題解決力・協働性",h:"目標 → 課題 → 行動 → 結果と学び（STARの型）"},
+ {q:"挫折した経験と、それをどう乗り越えたか教えてください。",p:"立ち直る力と、学びへの変え方",h:"状況 → 気持ちと行動の切り替え → 今に生きている教訓"},
+ {q:"あなたの長所と短所を教えてください。",p:"自己理解と、短所への対策",h:"長所は例つき、短所は対策とセットで正直に"},
+ {q:"チームで取り組んだ経験について教えてください。",p:"自分の役割と、周囲との関わり",h:"チームの目標 → 自分の役割と工夫 → 結果"},
+ {q:"5年後、どのような社会人になっていたいですか。",p:"成長意欲と、会社との方向性の一致",h:"結論 → そのために積みたい経験 → 会社への貢献"},
+ {q:"最後に、何か質問はありますか。（逆質問）",p:"入社意欲と、仕事理解の深さ",h:"業務内容・成長環境・若手の活躍など、入社後につながる質問を"}],
+"教員採用":[
+ {q:"教員を志望した理由を教えてください。",p:"志望の軸と、子どもへの思いの具体性",h:"結論 → きっかけとなった経験 → 目指す教師像"},
+ {q:"どのような教師になりたいですか。",p:"教師像の明確さと、実現への姿勢",h:"教師像 → その理由 → 具体的な実践のイメージ"},
+ {q:"授業で大切にしたいことは何ですか。",p:"授業観と、子どもの主体性を引き出す工夫",h:"結論 → 具体的な工夫の例 → 目指す子どもの姿"},
+ {q:"学級経営で大切にしたいことは何ですか。",p:"学級観と、安心できる場づくりへの理解",h:"結論 → 具体策（ルール・関係づくり） → 狙い"},
+ {q:"子ども同士のトラブルが起きたとき、どう対応しますか。",p:"冷静な対応力と、教育的配慮",h:"まず双方の話を聞く → 事実確認 → 指導と見守りの流れ"},
+ {q:"保護者から要望や相談を受けたとき、どう対応しますか。",p:"誠実なコミュニケーションと、管理職との連携",h:"傾聴 → 事実確認と報告・相談 → 丁寧な説明"},
+ {q:"最近の教育課題で関心のあることは何ですか。",p:"教育情勢への関心と、自分の考え",h:"課題の概要 → 自分の考え → 現場で意識したいこと"},
+ {q:"教員の不祥事防止について、どう考えますか。",p:"公務員としての自覚と、具体的な意識",h:"結論 → 日頃から意識する具体策 → 相談できる関係づくり"}]
+};
+const TYPE_LINE="結論 → 理由 → 具体例 → 締め";
+/* ================= interviewer illustration (2D SVG) ================= */
+function officerSVG(gender, expr){
+  const female = gender==="female";
+  const skin="#f6cfae", hair= female? "#5a4030" : "#333a45", suit="#33506e", shirt="#ffffff", tie= female? "" : `<path d="M100 118 L94 108 L106 108 Z" fill="#a33b32"/><path d="M100 118 L95 150 L100 158 L105 150 Z" fill="#a33b32"/>`;
+  const hairPath = female
+    ? `<path d="M52 96 Q46 30 100 26 Q154 30 148 96 L156 150 Q158 168 142 164 L136 108 Q132 62 100 60 Q68 62 64 108 L58 164 Q42 168 44 150 Z" fill="${hair}"/>`
+    : `<path d="M56 88 Q52 34 100 32 Q148 34 144 88 Q140 56 100 54 Q60 56 56 88 Z" fill="${hair}"/>`;
+  const eyes = expr==="thinking"
+    ? `<circle cx="82" cy="92" r="4.2" fill="#26303c"/><circle cx="118" cy="92" r="4.2" fill="#26303c"/><path d="M70 78 Q82 72 94 78" stroke="#26303c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M106 78 Q118 72 130 78" stroke="#26303c" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    : `<circle cx="82" cy="92" r="4.6" fill="#26303c"/><circle cx="118" cy="92" r="4.6" fill="#26303c"/><path d="M70 79 Q82 74 94 79" stroke="#26303c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M106 79 Q118 74 130 79" stroke="#26303c" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  const mouth = expr==="smile" ? `<path d="M88 116 Q100 128 112 116" stroke="#26303c" stroke-width="3.4" fill="none" stroke-linecap="round"/>`
+    : expr==="thinking" ? `<path d="M92 121 L108 121" stroke="#26303c" stroke-width="3.4" stroke-linecap="round"/>`
+    : expr==="stern" ? `<path d="M90 122 Q100 117 110 122" stroke="#26303c" stroke-width="3.4" fill="none" stroke-linecap="round"/>`
+    : `<path d="M90 118 Q100 124 110 118" stroke="#26303c" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
+  const extra = expr==="thinking" ? `<g><ellipse cx="160" cy="42" rx="20" ry="13" fill="#eef4fb" stroke="#b9c9dd"/><text x="160" y="48" font-size="15" text-anchor="middle" fill="#5c6a84">…</text></g>` : "";
+  const nod = expr==="nod" ? "transform:translate(0,3px)" : "";
+  return `<svg viewBox="0 0 200 190" width="118" height="112" role="img" aria-label="面接官">
+   <path d="M28 190 Q32 138 74 128 L126 128 Q168 138 172 190 Z" fill="${suit}"/>
+   <path d="M84 128 L100 156 L116 128 L108 124 L100 134 L92 124 Z" fill="${shirt}"/>${tie}
+   <g style="${nod}">
+    <ellipse cx="100" cy="88" rx="42" ry="46" fill="${skin}"/>
+    ${hairPath}
+    ${eyes}
+    <path d="M100 96 L97 108 Q100 111 103 108" stroke="#d8a87e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    ${mouth}
+    <circle cx="66" cy="110" r="6" fill="#f2a48d" opacity=".45"/><circle cx="134" cy="110" r="6" fill="#f2a48d" opacity=".45"/>
+   </g>${extra}</svg>`;
+}
+/* ================= speech (TTS / recognition) ================= */
+let voicePref = JSON.parse(sessionStorage.getItem("ms_voice")||"null");
+function speak(text, gender, mood, onend){
+  try{
+    const synth=window.speechSynthesis; if(!synth){ onend&&onend(); return; }
+    synth.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="ja-JP";
+    const vs=synth.getVoices().filter(v=>v.lang&&v.lang.startsWith("ja"));
+    if(vs.length){ const named=vs.find(v=> gender==="female" ? /Kyoko|Otoya.*fem|female|女性/i.test(v.name) : /Otoya|male|男性/i.test(v.name)); u.voice=named||vs[0]; }
+    u.pitch = gender==="female" ? 1.12 : 0.82;
+    u.rate = mood==="pressure" ? 1.06 : mood==="warm" ? 0.96 : 1.0;
+    u.onend=()=>{ onend&&onend(); }; u.onerror=()=>{ onend&&onend(); };
+    synth.speak(u);
+  }catch(e){ onend&&onend(); }
+}
+let recog=null;
+function startRecog(textarea, btn){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ alert("この端末・ブラウザでは音声入力に対応していません。テキスト入力をご利用ください。"); return; }
+  if(recog){ try{recog.stop();}catch(e){} recog=null; btn.classList.remove("mic-on"); btn.textContent="🎤 音声入力"; return; }
+  try{
+    recog=new SR(); recog.lang="ja-JP"; recog.interimResults=true; recog.continuous=true;
+    const base=textarea.value;
+    recog.onresult=e=>{ let txt=""; for(const r of e.results) txt+=r[0].transcript; textarea.value=base+txt; };
+    recog.onend=()=>{ recog=null; btn.classList.remove("mic-on"); btn.textContent="🎤 音声入力"; };
+    recog.onerror=()=>{ recog=null; btn.classList.remove("mic-on"); btn.textContent="🎤 音声入力"; };
+    recog.start(); btn.classList.add("mic-on"); btn.textContent="⏹ 停止する";
+  }catch(e){ alert("音声入力を開始できませんでした。テキスト入力をご利用ください。"); }
+}
+/* ================= screens: home / setup ================= */
+let view="home";
+function moodName(m){ return m==="warm"?"和やか":m==="pressure"?"圧迫":"標準"; }
+function renderHome(){
+  view="home"; const c=S.cfg;
+  $("#app").innerHTML=`
+   <div class="card">
+    <h2>練習の準備</h2>
+    <p class="kv">対象：<b>${esc(c.target)}</b>／志望先：<b>${esc(c.dest||"（未設定）")}</b>／面接官：<b>${c.gender==="female"?"女性":"男性"}</b>／雰囲気：<b>${moodName(c.mood)}</b>／質問数：<b>${c.qcount}問</b></p>
+    <p class="kv">AI：<b>${aiReady()? esc(S.ai.provider)+"（接続設定あり）" : "未設定（キーなし練習モード）"}</b></p>
+    <button class="btn" onclick="startInterview()">▶ 面接をはじめる</button>
+    <button class="btn sub" onclick="renderSetup()">⚙ 面接の設定</button>
+    <div class="row">
+      <button class="btn sub" onclick="renderBank()">📚 質問バンク・カスタム</button>
+      <button class="btn sub" onclick="renderAI()">🤖 AI設定</button>
+    </div>
+    <button class="btn sub" onclick="renderRecords()">🗂 練習記録（${S.records.length}件）</button>
+   </div>
+   <div class="card">
+    <h2>使い方</h2>
+    <ul class="check">
+      <li>質問は音声で読み上げられます。答えは<strong>音声入力</strong>（対応環境のみ）か<strong>テキスト入力</strong>でどうぞ。</li>
+      <li>答え方の型は <b>${TYPE_LINE}</b>。詰まったら各質問の「型」を見てください。</li>
+      <li>AIキーを設定すると、<strong>深掘り質問</strong>（1問につき1回まで）と、詳しいフィードバックが使えます。キーなしでも、バンク質問＋型＋自己チェックで練習が完結します。</li>
+      <li>途中でやめたいときは「途中で退出する」から、その時点までのフィードバックが見られます。</li>
+    </ul>
+    <p class="small">記録とAIキーは、この端末のブラウザ内にだけ保存されます。</p>
+   </div>`;
+  window.scrollTo(0,0); }
+let setupTmp=null;
+function renderSetup(){
+  view="setup"; setupTmp=JSON.parse(JSON.stringify(S.cfg));
+  const seg=(key,opts)=>`<div class="seg" data-k="${key}">${opts.map(o=>`<button data-v="${esc(o.v)}" class="${setupTmp[key]===o||String(setupTmp[key])===o?"on":""}">${esc(o)}</button>`).join("")}</div>`;
+  $("#app").innerHTML=`
+   <div class="nav"><button onclick="renderHome()">← ホーム</button></div>
+   <div class="card"><h2>⚙ 面接の設定</h2>
+    <label class="fl">対象</label>${seg("target",["中学受験","高校受験","大学受験","就活","教員採用"])}
+    <label class="fl">志望先（学校名・企業名など。質問セットの呼び出しにも使います）</label>
+    <input type="text" id="cfDest" value="${esc(setupTmp.dest)}" placeholder="例：〇〇高等学校">
+    <label class="fl">面接官の性別（声とイラストが変わります）</label>${seg("gender",["女性","男性"])}
+    <label class="fl">雰囲気</label>${seg("mood",["標準","和やか","圧迫"])}
+    <label class="fl">質問数</label>${seg("qcount",["3","5","7"])}
+    <button class="btn" onclick="saveSetup()">保存する</button>
+   </div>`;
+  document.querySelectorAll(".seg").forEach(sg=>{
+    sg.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      const k=sg.dataset.k; let v=b.dataset.v;
+      if(k==="gender") v = v==="女性"?"female":"male";
+      if(k==="mood") v = v==="和やか"?"warm":v==="圧迫"?"pressure":"standard";
+      if(k==="qcount") v = Number(v);
+      setupTmp[k]=v;
+      sg.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+    });
+  });
+  window.scrollTo(0,0); }
+function saveSetup(){ setupTmp.dest=$("#cfDest").value.trim(); S.cfg=setupTmp; save(); renderHome(); }
+/* ================= screens: question bank & custom ================= */
+let bankTarget="高校受験";
+function renderBank(){
+  view="bank";
+  const bank=BANK[bankTarget]||[];
+  const mine=S.custom.filter(q=>q.target===bankTarget);
+  $("#app").innerHTML=`
+   <div class="nav"><button onclick="renderHome()">← ホーム</button></div>
+   <div class="card"><h2>📚 質問バンク（対象別）</h2>
+    <div class="seg" id="bkSeg">${Object.keys(BANK).map(t=>`<button data-t="${t}" class="${bankTarget===t?"on":""}">${t}</button>`).join("")}</div>
+    ${bank.map(q=>`<div class="qitem"><div class="qt">${esc(q.q)}</div><p class="small">👀 面接官はここを見ている：${esc(q.p)}<br>✍ 型のヒント：${esc(q.h)}</p></div>`).join("")}
+   </div>
+   <div class="card"><h2>✏ 自分の質問（${bankTarget}）</h2>
+    <div id="myList">${mine.length? mine.map(q=>`
+      <div class="qitem"><div class="qt">${esc(q.text)}</div>
+       ${q.points?`<p class="small">👀 ポイント：${esc(q.points)}</p>`:""}
+       ${q.model?`<p class="small">📖 模範回答あり</p>`:""}
+       <div>
+        <button class="btn sub sm" onclick="editCustom('${q.id}')">編集</button>
+        ${aiReady()?`<button class="btn sub sm" onclick="genModel('${q.id}')">🤖 AIで模範回答を作る</button>`:""}
+        <button class="btn sub sm" onclick="delCustom('${q.id}')">削除</button>
+       </div></div>`).join("") : `<p class="small">まだありません。下のフォームから追加できます。</p>`}
+    </div>
+    <h3>質問を追加</h3>
+    <label class="fl">質問文</label><textarea id="cqText" style="min-height:70px" placeholder="例：本校の教育方針について、どう思いますか。"></textarea>
+    <label class="fl">模範回答（任意。AIで作ることもできます）</label><textarea id="cqModel" style="min-height:70px"></textarea>
+    <label class="fl">面接官はここを見ている（任意）</label><input type="text" id="cqPoints">
+    <button class="btn" onclick="addCustom()">追加する</button>
+   </div>
+   <div class="card"><h2>🗂 志望先ごとの質問セット</h2>
+    <p class="small">志望先の名前でセットを作ると、面接の設定でその志望先を入れたときに、セットの質問が優先して出題されます。</p>
+    <div id="setList">${S.sets.map(st=>`<div class="qitem"><div class="qt">🏫 ${esc(st.name)}（${st.qids.length}問）</div>
+      <p class="small">${st.qids.map(id=>{ const q=S.custom.find(x=>x.id===id); return q?esc(q.text):""; }).filter(Boolean).join("／")}</p>
+      <button class="btn sub sm" onclick="editSet('${st.id}')">編集</button>
+      <button class="btn sub sm" onclick="delSet('${st.id}')">削除</button></div>`).join("") || `<p class="small">まだセットがありません。</p>`}</div>
+    <h3>セットを作る・編集する</h3>
+    <label class="fl">志望先の名前</label><input type="text" id="setName" placeholder="例：〇〇高等学校">
+    <div id="setChecks">${S.custom.length? S.custom.map(q=>`<label style="display:block;font-size:14.5px;margin:6px 0"><input type="checkbox" class="setck" value="${q.id}"> ${esc(q.text)} <span class="small">（${esc(q.target)}）</span></label>`).join("") : `<p class="small">先に「自分の質問」を追加してください。</p>`}</div>
+    <button class="btn" onclick="saveSet()">セットを保存する</button>
+   </div>`;
+  document.querySelectorAll("#bkSeg button").forEach(b=>b.onclick=()=>{ bankTarget=b.dataset.t; renderBank(); });
+  window.scrollTo(0,0); }
+function addCustom(){
+  const text=$("#cqText").value.trim(); if(!text){ alert("質問文を入力してください。"); return; }
+  S.custom.push({id:uid(), target:bankTarget, text, model:$("#cqModel").value.trim(), points:$("#cqPoints").value.trim()});
+  save(); renderBank(); }
+function editCustom(id){
+  const q=S.custom.find(x=>x.id===id); if(!q)return;
+  const text=prompt("質問文", q.text); if(text===null)return;
+  const model=prompt("模範回答（空でもOK）", q.model||""); if(model===null)return;
+  const points=prompt("面接官はここを見ている（空でもOK）", q.points||""); if(points===null)return;
+  q.text=text.trim()||q.text; q.model=model.trim(); q.points=points.trim(); save(); renderBank(); }
+function delCustom(id){ if(!confirm("この質問を削除しますか？"))return;
+  S.custom=S.custom.filter(x=>x.id!==id); S.sets.forEach(st=>st.qids=st.qids.filter(x=>x!==id)); save(); renderBank(); }
+async function genModel(id){
+  const q=S.custom.find(x=>x.id===id); if(!q)return;
+  const btn=event.target; btn.disabled=true; btn.textContent="生成中…";
+  try{
+    const prompt=`対象：${q.target}／志望先：${S.cfg.dest||"未設定"} の面接質問「${q.text}」について、次の形式で答えてください。\n模範回答：（200字程度の一人称の模範回答）\nポイント：（面接官がこの質問で見ている点を1行）`;
+    const out=await aiChat(prompt);
+    const mm=out.match(/模範回答[:：]\s*([\s\S]*?)(?=\nポイント[:：]|$)/);
+    const pp=out.match(/ポイント[:：]\s*(.+)/);
+    q.model=(mm?mm[1]:out).trim(); if(pp) q.points=pp[1].trim();
+    save(); renderBank(); alert("模範回答を作成しました。");
+  }catch(e){ alert("生成できませんでした："+e.message); btn.disabled=false; btn.textContent="🤖 AIで模範回答を作る"; }
+}
+function saveSet(){
+  const name=$("#setName").value.trim(); if(!name){ alert("志望先の名前を入力してください。"); return; }
+  const qids=[...document.querySelectorAll(".setck:checked")].map(x=>x.value);
+  const ex=S.sets.find(s=>s.name===name);
+  if(ex) ex.qids=qids; else S.sets.push({id:uid(), name, qids});
+  save(); renderBank(); }
+function editSet(id){ const st=S.sets.find(s=>s.id===id); if(!st)return;
+  renderBank(); setTimeout(()=>{ $("#setName").value=st.name;
+    document.querySelectorAll(".setck").forEach(c=>c.checked=st.qids.includes(c.value));
+    $("#setName").scrollIntoView({behavior:"smooth"}); },50); }
+function delSet(id){ if(!confirm("このセットを削除しますか？"))return; S.sets=S.sets.filter(s=>s.id!==id); save(); renderBank(); }
+/* ================= screens: AI settings ================= */
+const PROV_META={
+  gemini:{name:"Gemini", keyLabel:"APIキー", modelLabel:"モデル", base:false, hint:"Google AI Studio で無料枠のキーが作れます。スマホからでも使える、いちばん手軽な無料ルートです。"},
+  openai:{name:"OpenAI", keyLabel:"APIキー", modelLabel:"モデル", base:false, hint:"OpenAI の APIキー（有料）を使います。"},
+  claude:{name:"Claude", keyLabel:"APIキー", modelLabel:"モデル", base:false, hint:"Anthropic の APIキー（有料）を使います。"},
+  custom:{name:"カスタム（OpenAI互換）", keyLabel:"APIキー（任意）", modelLabel:"モデル", base:true, hint:"OpenAI互換のエンドポイント（ベースURL）を指定します。Groq や OpenRouter などもこの形式で使えます。"},
+  ollama:{name:"Ollama（ローカルAI）", keyLabel:"", modelLabel:"モデル", base:true, hint:"完全無料ですが、Ollama を動かすパソコンが別に必要です（スマホ単体では動きません）。同じネットワークのパソコンのアドレスを指定してください。"}
+};
+function renderAI(){
+  view="ai"; const prov=S.ai.provider, c=S.ai.p[prov], meta=PROV_META[prov];
+  $("#app").innerHTML=`
+   <div class="nav"><button onclick="renderHome()">← ホーム</button></div>
+   <div class="card"><h2>🤖 AI設定</h2>
+    <p class="small">AIを設定すると、深掘り質問・模範回答の生成・詳しいフィードバックが使えます。キーとモデルはプロバイダごとに、この端末のブラウザ内だけに保存されます。</p>
+    <label class="fl">プロバイダ</label>
+    <div class="seg" id="aiSeg">${Object.keys(PROV_META).map(k=>`<button data-p="${k}" class="${prov===k?"on":""}">${PROV_META[k].name}</button>`).join("")}</div>
+    ${meta.base?`<label class="fl">ベースURL</label><input type="text" id="aiBase" value="${esc(c.base||"")}" placeholder="${prov==="ollama"?"http://localhost:11434":"https://.../v1"}">`:""}
+    ${meta.keyLabel?`<label class="fl">${meta.keyLabel}</label><input type="password" id="aiKey" value="${esc(c.key||"")}" autocomplete="off">`:""}
+    <label class="fl">${meta.modelLabel}</label><input type="text" id="aiModel" value="${esc(c.model||"")}">
+    <p class="small">${meta.hint}</p>
+    <button class="btn" onclick="saveAI()">保存する</button>
+    <button class="btn sub" onclick="testAI(this)">接続テスト</button>
+    <p class="small" id="aiTestResult"></p>
+   </div>
+   <div class="card"><h2>無料で使うには</h2>
+    <ul class="check">
+      <li><b>Gemini（おすすめ）</b>：Google AI Studio で無料枠の APIキー が発行できます。このアプリにキーを入れるだけで、スマホでも深掘り質問やフィードバックが使えます。</li>
+      <li><b>Ollama</b>：完全無料ですが、Ollama を動かすパソコンが別に必要です。自宅のパソコンで練習するとき向けです。</li>
+      <li><b>キーなしでもOK</b>：質問バンクと答え方の型、自己チェックのフィードバックだけで、自主練習は完結します。</li>
+    </ul>
+   </div>`;
+  document.querySelectorAll("#aiSeg button").forEach(b=>b.onclick=()=>{ saveAI(true); S.ai.provider=b.dataset.p; save(); renderAI(); });
+  window.scrollTo(0,0); }
+function saveAI(silent){
+  const prov=S.ai.provider, c=S.ai.p[prov];
+  const b=$("#aiBase"), k=$("#aiKey"), m=$("#aiModel");
+  if(b) c.base=b.value.trim(); if(k) c.key=k.value.trim(); if(m) c.model=m.value.trim();
+  save(); if(!silent) renderHome(); }
+async function testAI(btn){
+  saveAI(true); const out=$("#aiTestResult"); btn.disabled=true; out.textContent="接続テスト中…";
+  try{ const r=await aiChat("接続テストです。「OK」とだけ返してください。");
+    out.textContent="✅ 接続できました（応答："+r.slice(0,40)+"）"; }
+  catch(e){ out.textContent="❌ 接続できませんでした："+e.message; }
+  btn.disabled=false; }
+/* ================= screens: records ================= */
+function renderRecords(){
+  view="records";
+  $("#app").innerHTML=`
+   <div class="nav"><button onclick="renderHome()">← ホーム</button></div>
+   <div class="card"><h2>🗂 練習記録</h2>
+    ${S.records.length? S.records.slice().reverse().map(r=>`<div class="rec"><b>${esc(r.date)}</b> ${esc(r.target)}／${esc(r.dest||"志望先なし")}・${esc(moodName(r.mood))}・${r.answers.length}問回答${r.partial?"（途中退出）":""}</div>`).join("") : `<p class="small">まだ記録がありません。</p>`}
+    ${S.records.length?`<button class="btn ghost" onclick="if(confirm('記録をすべて消します。よろしいですか？')){try{localStorage.removeItem(LSKEY);}catch(e){} S=freshState(); save(); renderHome();}">記録をすべて消す</button>`:""}
+   </div>`;
+  window.scrollTo(0,0); }
+/* ================= interview flow ================= */
+let session=null;
+function buildQuestions(){
+  const c=S.cfg;
+  const set=S.sets.find(s=>s.name===c.dest);
+  const fromSet=[];
+  if(set){ set.qids.forEach(id=>{ const q=S.custom.find(x=>x.id===id);
+    if(q) fromSet.push({text:q.text, points:q.points||"", hint:"", model:q.model||"", custom:true}); }); }
+  if(fromSet.length>=c.qcount) return fromSet.slice(0,c.qcount);
+  const bank=shuffle((BANK[c.target]||[]).map(q=>({text:q.q, points:q.p, hint:q.h, model:"", custom:false})));
+  const list=[...fromSet];
+  for(const b of bank){ if(list.length>=c.qcount) break; if(!list.some(x=>x.text===b.text)) list.push(b); }
+  return list;
+}
+function startInterview(){
+  const list=buildQuestions();
+  if(!list.length){ alert("出題できる質問がありません。"); return; }
+  session={ list, idx:0, phase:"main", answers:[], startedAt:todayStr() };
+  renderPractice(true);
+}
+function frameLine(first){
+  const c=S.cfg;
+  if(first){ return c.mood==="warm" ? "こんにちは。今日はよろしくお願いします。リラックスして答えてくださいね。では、質問します。"
+    : c.mood==="pressure" ? "それでは始めます。端的に答えてください。"
+    : "それでは、面接を始めます。"; }
+  return c.mood==="warm" ? "ありがとうございます。では、次の質問です。"
+    : c.mood==="pressure" ? "はい。次です。"
+    : "ありがとうございます。次の質問です。";
+}
+function renderPractice(first){
+  view="practice"; const c=S.cfg, q=session.list[session.idx];
+  const isFollow=session.phase==="follow";
+  const dispQ=isFollow? session.followText : q.text;
+  const expr= c.mood==="pressure" ? "stern" : "normal";
+  $("#app").innerHTML=`
+   <div class="card">
+    <div class="qmeta">${esc(c.target)}／${esc(c.dest||"志望先未設定")}・${session.idx+1} / ${session.list.length} 問目${isFollow?"（深掘り質問）":""}<span style="float:right"><button class="btn ghost sm" style="margin:0" onclick="exitInterview()">途中で退出する</button></span></div>
+    <div class="prog"><i style="width:${session.idx/session.list.length*100}%"></i></div>
+    <div class="officer">
+      <div class="face" id="officerFace">${officerSVG(c.gender, expr)}</div>
+      <div class="balloon"><div class="small">${esc(frameLine(!!first))}</div>${esc(dispQ)}</div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sub sm" onclick="replayTTS()">🔊 もう一度聞く</button>
+      ${isFollow?"":`<button class="btn sub sm" onclick="toggleKata()">✍ 型を見る</button>`}
+    </div>
+    <div id="kataArea"></div>
+    <label class="fl">あなたの答え</label>
+    <textarea id="ansText" placeholder="ここに入力するか、音声入力ボタンで話してください。"></textarea>
+    <div class="row">
+      <button class="btn sub" id="micBtn" onclick="startRecog($('#ansText'), this)">🎤 音声入力</button>
+      <button class="btn" id="submitBtn" onclick="submitAnswer()">${isFollow? "答える（次へ）" : (aiReady()? "答える" : "答える（次へ）")}</button>
+    </div>
+    <p class="small" id="flowNote"></p>
+   </div>`;
+  speak(dispQ, c.gender, c.mood);
+  window.scrollTo(0,0); }
+function replayTTS(){ const c=S.cfg; const q=session.phase==="follow"? session.followText : session.list[session.idx].text; speak(q, c.gender, c.mood); }
+function toggleKata(){
+  const q=session.list[session.idx]; const area=$("#kataArea");
+  if(area.innerHTML){ area.innerHTML=""; return; }
+  area.innerHTML=`<div class="kata"><b>答え方の型：</b>${TYPE_LINE}<br>${q.hint?`<b>この質問のヒント：</b>${esc(q.hint)}<br>`:""}${q.points?`<b>面接官はここを見ている：</b>${esc(q.points)}`:""}</div>`;
+}
+let submitting=false;
+async function submitAnswer(){
+  if(submitting) return;
+  const txt=$("#ansText").value.trim();
+  if(!txt){ alert("答えを入力してください（音声入力でもOKです）。"); return; }
+  const c=S.cfg, q=session.list[session.idx];
+  if(recog){ try{recog.stop();}catch(e){} recog=null; }
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(session.phase==="main"){
+    session.answers.push({q:q.text, a:txt, points:q.points||"", hint:q.hint||"", model:q.model||"", fq:"", fa:""});
+    /* deep-dive follow-up (AI mode, once per question) */
+    if(aiReady()){
+      submitting=true;
+      $("#officerFace").innerHTML=officerSVG(c.gender,"thinking");
+      $("#flowNote").textContent="面接官が深掘り質問を考えています…";
+      $("#submitBtn").disabled=true;
+      try{
+        const moodInst= c.mood==="pressure" ? "やや厳しめに、核心を突く" : c.mood==="warm" ? "やさしく、答えを引き出す" : "標準的な";
+        const out=await aiChat(`対象：${c.target}／志望先：${c.dest||"未設定"} の面接です。質問「${q.text}」への回答「${txt}」に対して、${moodInst}深掘り質問を1つだけ作ってください。質問文のみを1行で返してください。`);
+        const f=out.split("\n").map(x=>x.trim()).filter(Boolean)[0];
+        if(f){ session.phase="follow"; session.followText=f; submitting=false; renderPractice(false); return; }
+      }catch(e){ $("#flowNote").textContent="深掘り質問は生成できませんでした（そのまま次へ進みます）。"; }
+      submitting=false;
+    }
+    nextQuestion();
+  } else {
+    const rec=session.answers[session.answers.length-1];
+    rec.fq=session.followText||""; rec.fa=txt;
+    session.phase="main"; session.followText="";
+    nextQuestion();
+  }
+}
+function nextQuestion(){
+  const c=S.cfg;
+  $("#officerFace").innerHTML=officerSVG(c.gender,"nod");
+  session.idx++;
+  if(session.idx>=session.list.length){ finishSession(false); return; }
+  setTimeout(()=>renderPractice(false), 450);
+}
+function exitInterview(){
+  if(!session) return;
+  if(!confirm("面接を途中で退出しますか？ここまでの回答でフィードバックを出します。")) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  finishSession(true);
+}
+/* ================= feedback ================= */
+function checkAnswer(rec){
+  const a=rec.a||""; const n=a.length; const checks=[];
+  const hasNum=/\d/.test(a), hasExample=/例えば|経験|参加|取り組|頑張|活動|大会|練習/.test(a),
+        hasReason=/理由|なぜなら|だから|そのため|きっかけ/.test(a),
+        polite=/です|ます/.test(a),
+        hasClose=/たいです|ていきます|頑張り|目指し|生かし|学びたい|挑戦/.test(a);
+  checks.push({ok:n>=60, txt: n<40? `文字数が少なめ（${n}字）。1つの答えは60〜150字が目安です。` : n<=220? `文字数は適切です（${n}字）。` : `少し長めです（${n}字）。要点を絞ると伝わりやすくなります。`});
+  checks.push({ok:hasExample||hasNum, txt: hasExample||hasNum? "具体例や数字が入っていて、説得力があります。" : "具体例（経験・数字・場面）が入ると、ぐっと説得力が増します。"});
+  checks.push({ok:hasReason, txt: hasReason? "理由やきっかけが述べられています。" : "「理由は〜」「きっかけは〜」と、理由をひと言添えましょう。"});
+  checks.push({ok:polite, txt: polite? "丁寧な言葉遣いで答えられています。" : "「です・ます」調で締めると、面接らしい丁寧さになります。"});
+  checks.push({ok:hasClose, txt: hasClose? "締め（意欲・目標）まで言えています。" : "最後に「〜したいです」と意欲や目標で締めると印象が残ります。"});
+  const score=checks.filter(x=>x.ok).length;
+  return {checks, score};
+}
+function finishSession(partial){
+  const c=S.cfg;
+  S.records.push({date:todayStr(), target:c.target, dest:c.dest, mood:c.mood, partial, answers:session.answers});
+  save();
+  const recs=session.answers.map(rec=>({rec, chk:checkAnswer(rec)}));
+  const tot=recs.reduce((s,x)=>s+x.chk.score,0), max=recs.length*5||1;
+  const level= tot/max>=0.8? "よく健闘" : tot/max>=0.55? "まずまず" : "伸びしろ大";
+  const weak=[];
+  if(recs.some(x=>!x.chk.checks[1].ok)) weak.push("具体例を足す");
+  if(recs.some(x=>!x.chk.checks[2].ok)) weak.push("理由・きっかけを添える");
+  if(recs.some(x=>!x.chk.checks[4].ok)) weak.push("締めの意欲まで言う");
+  session=null; view="feedback";
+  $("#app").innerHTML=`
+   <div class="card">
+    <h2>📋 フィードバック${partial?"（途中退出）":""}</h2>
+    <p class="small">${esc(c.target)}／${esc(c.dest||"志望先未設定")}・${recs.length}問に回答・自己チェック総合：<b>${level}</b>（${tot}/${max}）</p>
+    <h3>① 内容の具体性と熱意</h3>
+    <p>${recs.map((x,i)=>`問${i+1}：${x.chk.checks[1].ok?"具体例あり":"具体例が薄め"}・${x.chk.checks[4].ok?"締めまで言えた":"締めが弱い"}`).join("／")||"—"}</p>
+    <h3>② 受け答えの適切さ</h3>
+    <p>${recs.map((x,i)=>`問${i+1}：${x.chk.checks[3].ok?"丁寧な言葉遣い":"言葉遣いに注意"}・${x.chk.checks[0].ok?"長さ適切":"長さに注意"}`).join("／")||"—"}</p>
+    <h3>③ 改善へのアドバイス</h3>
+    <p>${weak.length? "次は特に「"+weak.join("」「")+"」を意識してみましょう。" : "型が身についています。この調子で本番に臨みましょう。"}</p>
+    <div class="kata"><b>修正文案の型：</b>結論「（質問への答えを一文で）」→ 理由「理由は〜です。きっかけは〜」→ 具体例「例えば、〜した経験があります」→ 締め「入学（入社）後は〜したいです」</div>
+    ${aiReady()?`<button class="btn" id="aiFbBtn" onclick="aiFeedback(this)">🤖 AIに詳しいフィードバックをもらう</button><div id="aiFbArea"></div>`:`<p class="small">AIキーを設定すると、深掘り質問に加えて、回答ごとの詳しいフィードバックと修正文案がもらえます。</p>`}
+   </div>
+   ${recs.map((x,i)=>`
+   <div class="card">
+    <h3>問${i+1}：${esc(x.rec.q)}</h3>
+    ${x.rec.fq?`<p class="small">深掘り：${esc(x.rec.fq)}</p>`:""}
+    <ul class="check">${x.chk.checks.map(ch=>`<li>${ch.ok?"✅":"🔸"} ${esc(ch.txt)}</li>`).join("")}</ul>
+    <div class="ans2">
+      <div class="ansbox2"><h4>あなたの回答</h4>${esc(x.rec.a)}${x.rec.fa?`\n（深掘りへの回答）${esc(x.rec.fa)}`:""}</div>
+      ${x.rec.model?`<div class="ansbox2 model"><h4>模範回答</h4>${esc(x.rec.model)}</div>`
+        : `<div class="ansbox2"><h4>答え方の型・ポイント</h4>${TYPE_LINE}${x.rec.hint?`\nヒント：${esc(x.rec.hint)}`:""}${x.rec.points?`\n👀 ${esc(x.rec.points)}`:""}</div>`}
+    </div>
+   </div>`).join("")}
+   <button class="btn sub" onclick="renderHome()">ホームへ戻る</button>`;
+  window.scrollTo(0,0); }
+async function aiFeedback(btn){
+  const r=S.records[S.records.length-1]; if(!r) return;
+  btn.disabled=true; btn.textContent="生成中…";
+  const area=$("#aiFbArea");
+  try{
+    const qa=r.answers.map((x,i)=>`問${i+1}：${x.q}\n回答：${x.a}${x.fq?`\n深掘り：${x.fq}\n深掘りへの回答：${x.fa}`:""}`).join("\n\n");
+    const out=await aiChat(`対象：${r.target}／志望先：${r.dest||"未設定"} の面接練習の記録です。次の3つの観点でフィードバックしてください。①内容の具体性と熱意 ②受け答えの適切さ ③改善へのアドバイス（いちばん弱い回答1つについて、書き直した修正文案も示す）。\n\n${qa}`);
+    area.innerHTML=`<div class="ansbox2 model" style="margin-top:10px"><h4>🤖 AIフィードバック</h4>${esc(out)}</div>`;
+    btn.textContent="🤖 AIフィードバック取得済み";
+  }catch(e){ area.innerHTML=`<p class="small">取得できませんでした：${esc(e.message)}</p>`; btn.disabled=false; btn.textContent="🤖 AIに詳しいフィードバックをもらう"; }
+}
+/* ================= boot ================= */
+try{ load(); renderHome(); window.__msBooted=true; }
+catch(e){ const el=document.getElementById("app");
+  if(el) el.innerHTML='<div class="card"><h2>アプリを起動できませんでした</h2><p>この表示環境では、スクリプトや保存機能（localStorage）が制限されている可能性があります。</p><p>Safari や Chrome でファイルを開くか、公開ページのURLから開いてみてください。</p><p class="small">詳細: '+String(e&&e.message||e)+'</p></div>'; }
+window.__aiChat=aiChat; window.__state=()=>S; window.__bank=BANK;
+</script>
+</body>
+</html>
