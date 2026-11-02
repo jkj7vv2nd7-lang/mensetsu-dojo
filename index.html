@@ -26,6 +26,7 @@ main{max-width:720px;margin:0 auto;padding:14px 12px 40px}
 .btn.sm{width:auto;display:inline-block;padding:8px 14px;font-size:14px;margin:4px 4px 4px 0}
 .btn:disabled{opacity:.45}
 .row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}
+.btn.smallbtn{display:inline-block;width:auto;padding:5px 10px;font-size:12.5px;border-radius:8px;margin:0 0 0 6px;vertical-align:middle;font-weight:600}
 label.fl{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
 input[type=text],input[type=date],input[type=password],textarea,select{width:100%;font-size:16px;padding:10px;border:1.6px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}
 textarea{min-height:110px;line-height:1.6;resize:vertical}
@@ -213,20 +214,57 @@ function officerSVG(gender, expr){
 }
 /* ================= speech (TTS / recognition) ================= */
 let voicePref = JSON.parse(sessionStorage.getItem("ms_voice")||"null");
+function mkUtter(text, gender, mood){
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="ja-JP";
+  try{
+    const vs=window.speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.startsWith("ja"));
+    if(vs.length){ const named=vs.find(v=> gender==="female" ? /Kyoko|Otoya.*fem|female|女性/i.test(v.name) : /Otoya|male|男性/i.test(v.name)); u.voice=named||vs[0]; }
+  }catch(e){}
+  u.pitch = gender==="female" ? 1.12 : 0.82;
+  u.rate = mood==="pressure" ? 1.06 : mood==="warm" ? 0.96 : 1.0;
+  return u;
+}
 function speak(text, gender, mood, onend){
   try{
     const synth=window.speechSynthesis; if(!synth){ onend&&onend(); return; }
     synth.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.lang="ja-JP";
-    const vs=synth.getVoices().filter(v=>v.lang&&v.lang.startsWith("ja"));
-    if(vs.length){ const named=vs.find(v=> gender==="female" ? /Kyoko|Otoya.*fem|female|女性/i.test(v.name) : /Otoya|male|男性/i.test(v.name)); u.voice=named||vs[0]; }
-    u.pitch = gender==="female" ? 1.12 : 0.82;
-    u.rate = mood==="pressure" ? 1.06 : mood==="warm" ? 0.96 : 1.0;
+    const u=mkUtter(text, gender, mood);
     u.onend=()=>{ onend&&onend(); }; u.onerror=()=>{ onend&&onend(); };
     synth.speak(u);
   }catch(e){ onend&&onend(); }
 }
+/* ---- feedback voice playback (v1.1): sentence-chunked queue ---- */
+let fbTexts=[];
+function splitSpeakText(text){
+  const s=String(text||"").replace(/\s+/g," ").trim(); if(!s) return [];
+  const raw=s.match(/[^。！？!?\n]+[。！？!?]?/g)||[s];
+  const chunks=[];
+  raw.map(x=>x.trim()).filter(Boolean).forEach(sent=>{
+    if(sent.length<=100){ chunks.push(sent); return; }
+    let rest=sent;
+    while(rest.length>100){
+      let cut=rest.lastIndexOf("、",100); if(cut<40) cut=rest.lastIndexOf("・",100); if(cut<40) cut=100;
+      chunks.push(rest.slice(0,cut+1)); rest=rest.slice(cut+1);
+    }
+    if(rest) chunks.push(rest);
+  });
+  return chunks;
+}
+function ttsClean(t){
+  return String(t||"").replace(/[①②③✅🔸🤖📋]/g,"").replace(/／/g,"。").replace(/：/g,"、").replace(/\n/g," ").trim();
+}
+function speakFb(i){
+  try{
+    const synth=window.speechSynthesis; if(!synth){ alert("この端末では読み上げが使えません"); return; }
+    const texts = i<0 ? fbTexts : [fbTexts[i]];
+    const chunks=[]; texts.forEach(t=>{ splitSpeakText(ttsClean(t)).forEach(c=>chunks.push(c)); });
+    if(!chunks.length) return;
+    synth.cancel();
+    chunks.forEach(c=>{ synth.speak(mkUtter(c, S.cfg.gender, S.cfg.mood)); });
+  }catch(e){}
+}
+function stopSpeak(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
 let recog=null;
 function startRecog(textarea, btn){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -245,6 +283,7 @@ function startRecog(textarea, btn){
 let view="home";
 function moodName(m){ return m==="warm"?"和やか":m==="pressure"?"圧迫":"標準"; }
 function renderHome(){
+  stopSpeak();
   view="home"; const c=S.cfg;
   $("#app").innerHTML=`
    <div class="card">
@@ -458,6 +497,7 @@ function frameLine(first){
     : "ありがとうございます。次の質問です。";
 }
 function renderPractice(first){
+  if(!session) return;
   view="practice"; const c=S.cfg, q=session.list[session.idx];
   const isFollow=session.phase==="follow";
   const dispQ=isFollow? session.followText : q.text;
@@ -510,9 +550,10 @@ async function submitAnswer(){
       try{
         const moodInst= c.mood==="pressure" ? "やや厳しめに、核心を突く" : c.mood==="warm" ? "やさしく、答えを引き出す" : "標準的な";
         const out=await aiChat(`対象：${c.target}／志望先：${c.dest||"未設定"} の面接です。質問「${q.text}」への回答「${txt}」に対して、${moodInst}深掘り質問を1つだけ作ってください。質問文のみを1行で返してください。`);
+        if(!session){ submitting=false; return; }
         const f=out.split("\n").map(x=>x.trim()).filter(Boolean)[0];
         if(f){ session.phase="follow"; session.followText=f; submitting=false; renderPractice(false); return; }
-      }catch(e){ $("#flowNote").textContent="深掘り質問は生成できませんでした（そのまま次へ進みます）。"; }
+      }catch(e){ if(session){ const fn=$("#flowNote"); if(fn) fn.textContent="深掘り質問は生成できませんでした（そのまま次へ進みます）。"; } }
       submitting=false;
     }
     nextQuestion();
@@ -528,7 +569,7 @@ function nextQuestion(){
   $("#officerFace").innerHTML=officerSVG(c.gender,"nod");
   session.idx++;
   if(session.idx>=session.list.length){ finishSession(false); return; }
-  setTimeout(()=>renderPractice(false), 450);
+  setTimeout(()=>{ if(session) renderPractice(false); }, 450);
 }
 function exitInterview(){
   if(!session) return;
@@ -562,17 +603,25 @@ function finishSession(partial){
   if(recs.some(x=>!x.chk.checks[1].ok)) weak.push("具体例を足す");
   if(recs.some(x=>!x.chk.checks[2].ok)) weak.push("理由・きっかけを添える");
   if(recs.some(x=>!x.chk.checks[4].ok)) weak.push("締めの意欲まで言う");
+  const body1=recs.map((x,i)=>`問${i+1}：${x.chk.checks[1].ok?"具体例あり":"具体例が薄め"}・${x.chk.checks[4].ok?"締めまで言えた":"締めが弱い"}`).join("／")||"—";
+  const body2=recs.map((x,i)=>`問${i+1}：${x.chk.checks[3].ok?"丁寧な言葉遣い":"言葉遣いに注意"}・${x.chk.checks[0].ok?"長さ適切":"長さに注意"}`).join("／")||"—";
+  const body3=weak.length? "次は特に「"+weak.join("」「")+"」を意識してみましょう。" : "型が身についています。この調子で本番に臨みましょう。";
+  fbTexts=[ "内容の具体性と熱意。"+body1, "受け答えの適切さ。"+body2, "改善へのアドバイス。"+body3 ];
   session=null; view="feedback";
   $("#app").innerHTML=`
    <div class="card">
     <h2>📋 フィードバック${partial?"（途中退出）":""}</h2>
     <p class="small">${esc(c.target)}／${esc(c.dest||"志望先未設定")}・${recs.length}問に回答・自己チェック総合：<b>${level}</b>（${tot}/${max}）</p>
-    <h3>① 内容の具体性と熱意</h3>
-    <p>${recs.map((x,i)=>`問${i+1}：${x.chk.checks[1].ok?"具体例あり":"具体例が薄め"}・${x.chk.checks[4].ok?"締めまで言えた":"締めが弱い"}`).join("／")||"—"}</p>
-    <h3>② 受け答えの適切さ</h3>
-    <p>${recs.map((x,i)=>`問${i+1}：${x.chk.checks[3].ok?"丁寧な言葉遣い":"言葉遣いに注意"}・${x.chk.checks[0].ok?"長さ適切":"長さに注意"}`).join("／")||"—"}</p>
-    <h3>③ 改善へのアドバイス</h3>
-    <p>${weak.length? "次は特に「"+weak.join("」「")+"」を意識してみましょう。" : "型が身についています。この調子で本番に臨みましょう。"}</p>
+    <div class="row" style="margin:10px 0">
+      <button class="btn" onclick="speakFb(-1)">🔊 全部読み上げる</button>
+      <button class="btn sub" onclick="stopSpeak()">⏹ 停止</button>
+    </div>
+    <h3>① 内容の具体性と熱意 <button class="btn smallbtn" onclick="speakFb(0)">🔊 読み上げ</button></h3>
+    <p>${body1}</p>
+    <h3>② 受け答えの適切さ <button class="btn smallbtn" onclick="speakFb(1)">🔊 読み上げ</button></h3>
+    <p>${body2}</p>
+    <h3>③ 改善へのアドバイス <button class="btn smallbtn" onclick="speakFb(2)">🔊 読み上げ</button></h3>
+    <p>${body3}</p>
     <div class="kata"><b>修正文案の型：</b>結論「（質問への答えを一文で）」→ 理由「理由は〜です。きっかけは〜」→ 具体例「例えば、〜した経験があります」→ 締め「入学（入社）後は〜したいです」</div>
     ${aiReady()?`<button class="btn" id="aiFbBtn" onclick="aiFeedback(this)">🤖 AIに詳しいフィードバックをもらう</button><div id="aiFbArea"></div>`:`<p class="small">AIキーを設定すると、深掘り質問に加えて、回答ごとの詳しいフィードバックと修正文案がもらえます。</p>`}
    </div>
@@ -604,7 +653,7 @@ async function aiFeedback(btn){
 try{ load(); renderHome(); window.__msBooted=true; }
 catch(e){ const el=document.getElementById("app");
   if(el) el.innerHTML='<div class="card"><h2>アプリを起動できませんでした</h2><p>この表示環境では、スクリプトや保存機能（localStorage）が制限されている可能性があります。</p><p>Safari や Chrome でファイルを開くか、公開ページのURLから開いてみてください。</p><p class="small">詳細: '+String(e&&e.message||e)+'</p></div>'; }
-window.__aiChat=aiChat; window.__state=()=>S; window.__bank=BANK;
+window.__aiChat=aiChat; window.__state=()=>S; window.__bank=BANK; window.__split=splitSpeakText; window.__speakFb=speakFb; window.__fbTexts=()=>fbTexts;
 </script>
 </body>
 </html>
